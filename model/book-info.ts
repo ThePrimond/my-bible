@@ -3,7 +3,7 @@ import { BibleBook } from "./books";
 export const bookInfo: {
   name: BibleBook;
   chapters: number;
-  verses?: number[];
+  verses: number[];
 }[] = [
   {
     name: BibleBook.Genesis,
