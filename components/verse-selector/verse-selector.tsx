@@ -1,5 +1,5 @@
 import { Button, Flex, Select } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React from "react";
 import { BibleBook, VerseSelection, bookInfo } from "../../model";
 import {
   ArrowRight,
@@ -10,77 +10,28 @@ import {
   Play,
   ShareFat,
 } from "@phosphor-icons/react";
-import { getVerse } from "../../service";
+import { useVerseSelector } from "../../hooks";
 
-export type VerseSelectorProps = object;
-
-const preSelectedVerse: VerseSelection = {
-  book: BibleBook.Psalms,
-  chapter: 90,
-  from: 0,
-  to: 16,
+export type VerseSelectorProps = {
+  onFetchVerses: (selected: VerseSelection) => Promise<void>;
 };
 
-export const VerseSelector: React.FC<VerseSelectorProps> = () => {
-  const [selected, setSelection] = useState(preSelectedVerse);
-  const [availableChapters, setAvailableChapters] = useState(
-    bookInfo[18].chapters
-  );
+export const VerseSelector: React.FC<VerseSelectorProps> = ({
+  onFetchVerses,
+}) => {
+  const { selected, onInputChange, availableChapters, availableVerses } =
+    useVerseSelector();
 
-  const [availableVerses, setAvailableVerses] = useState(
-    bookInfo[18].verses[preSelectedVerse.chapter!]
-  );
-
-  const onInputChange = <T extends keyof VerseSelection>(
-    key: T,
-    value: VerseSelection[T]
-  ) => {
-    const updated = { ...selected };
-    updated[key] = value;
-    if (key === "book") {
-      //  find chapter count based on book
-      const newAvailableChapters = bookInfo.find(
-        (b) => b.name === value
-      )?.chapters;
-      setAvailableChapters(newAvailableChapters!);
-
-      // reset as chapter count will be different
-      updated["chapter"] = null;
-      updated["from"] = null;
-      updated["to"] = null;
-    } else if (key === "chapter") {
-      // find verses count based on chapter
-      const currentBookInfo = bookInfo.find((b) => b.name === selected.book)!;
-      const newAvailableVerses = currentBookInfo.verses[value as number];
-      setAvailableVerses(newAvailableVerses);
-
-      // reset as verses count will be different
-      updated["from"] = null;
-      updated["to"] = null;
-    }
-    setSelection(updated);
-    console.log(updated);
+  const onPlay = () => {
+    onFetchVerses(selected);
   };
 
-  const onPlay = async () => {
-    const { book, chapter, from, to } = selected;
-    if (book && chapter) {
-      const formattedFrom = from! + 1;
-      const formattedTo = to ? to - 1 : null;
-      const verses = await getVerse(
-        book,
-        chapter + 1,
-        formattedFrom,
-        formattedTo
-      );
-    }
-  };
   return (
     <Flex p='24px' gap='24px' flexDirection='column' minW='33%' maxW='50%'>
       <Select
         icon={<Book />}
         key='book'
-        placeholder='Select a book'
+        placeholder='Book'
         variant='filled'
         value={selected.book}
         onChange={(e) => onInputChange("book", e.target.value as BibleBook)}>
@@ -92,7 +43,7 @@ export const VerseSelector: React.FC<VerseSelectorProps> = () => {
       <Select
         icon={<BookOpenText />}
         key='chapter'
-        placeholder='Select a chapter'
+        placeholder='Chapter'
         variant='filled'
         value={selected.chapter || 0}
         onChange={(e) => onInputChange("chapter", Number(e.target.value))}>
@@ -108,7 +59,7 @@ export const VerseSelector: React.FC<VerseSelectorProps> = () => {
           icon={<Article />}
           flex='1 1 50%'
           key='from'
-          placeholder='Select a starting verse'
+          placeholder='Starting verse'
           variant='filled'
           value={selected.from || 0}
           onChange={(e) => onInputChange("from", Number(e.target.value))}>
@@ -123,7 +74,7 @@ export const VerseSelector: React.FC<VerseSelectorProps> = () => {
           icon={<Article />}
           flex='1 1 50%'
           key='to'
-          placeholder='Select a ending verse'
+          placeholder='Ending verse'
           variant='filled'
           value={selected.to || 0}
           onChange={(e) => onInputChange("to", Number(e.target.value))}>

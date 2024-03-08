@@ -17,6 +17,7 @@ export const getVerse = async (
   const response = await bibleAPI.get<unknown, AxiosResponse<Verse>>(
     `${book} ${chapter}:${verseRange}`
   );
-  const verses = response.data.text;
-  return verses;
+  const verses = response.data.verses.map((v) => v.text);
+  const fromVerse = response.data.verses[0].verse;
+  return { verses, fromVerse };
 };
