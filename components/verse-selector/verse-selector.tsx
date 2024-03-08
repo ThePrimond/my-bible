@@ -10,6 +10,7 @@ import {
   Play,
   ShareFat,
 } from "@phosphor-icons/react";
+import { getVerse } from "../../service";
 
 export type VerseSelectorProps = object;
 
@@ -61,6 +62,19 @@ export const VerseSelector: React.FC<VerseSelectorProps> = () => {
     console.log(updated);
   };
 
+  const onPlay = async () => {
+    const { book, chapter, from, to } = selected;
+    if (book && chapter) {
+      const formattedFrom = from! + 1;
+      const formattedTo = to ? to - 1 : null;
+      const verses = await getVerse(
+        book,
+        chapter + 1,
+        formattedFrom,
+        formattedTo
+      );
+    }
+  };
   return (
     <Flex p='24px' gap='24px' flexDirection='column' minW='33%' maxW='50%'>
       <Select
@@ -122,7 +136,11 @@ export const VerseSelector: React.FC<VerseSelectorProps> = () => {
       </Flex>
 
       <Flex gap='24px' flexBasis='100%'>
-        <Button w='100%' colorScheme='green' leftIcon={<Play />}>
+        <Button
+          w='100%'
+          onClick={onPlay}
+          colorScheme='green'
+          leftIcon={<Play />}>
           Play
         </Button>
         <Button w='100%' leftIcon={<Heart />}>
