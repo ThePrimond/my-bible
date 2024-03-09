@@ -18,6 +18,7 @@ export const useBibleVerses = () => {
       );
       setVerses(verses);
       setStartingVerseNumber(fromVerse);
+      return verses;
     }
   };
 

@@ -10,10 +10,10 @@ import {
   Play,
   ShareFat,
 } from "@phosphor-icons/react";
-import { useVerseSelector } from "../../hooks";
+import { useSpeechEngine, useVerseSelector } from "../../hooks";
 
 export type VerseSelectorProps = {
-  onFetchVerses: (selected: VerseSelection) => Promise<void>;
+  onFetchVerses: (selected: VerseSelection) => Promise<string[] | undefined>;
 };
 
 export const VerseSelector: React.FC<VerseSelectorProps> = ({
@@ -22,8 +22,11 @@ export const VerseSelector: React.FC<VerseSelectorProps> = ({
   const { selected, onInputChange, availableChapters, availableVerses } =
     useVerseSelector();
 
-  const onPlay = () => {
-    onFetchVerses(selected);
+  const { onLoad, onPlay } = useSpeechEngine();
+
+  const onListen = async () => {
+    const verses = await onFetchVerses(selected);
+    if (verses) onLoad(verses);
   };
 
   return (
@@ -89,7 +92,7 @@ export const VerseSelector: React.FC<VerseSelectorProps> = ({
       <Flex gap='24px' flexBasis='100%'>
         <Button
           w='100%'
-          onClick={onPlay}
+          onClick={onListen}
           colorScheme='green'
           leftIcon={<Play />}>
           Play

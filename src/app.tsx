@@ -11,7 +11,11 @@ export const App: React.FC<AppProps> = () => {
   return (
     <Flex gap='8px'>
       <VerseSelector onFetchVerses={onFetchVerses} />
-      <Scroll fromVerseNumber={startingVerseNumber} verses={verses} />
+      <Flex p='24px' alignItems='center' justifyContent='center'>
+        {verses.length !== 0 && (
+          <Scroll fromVerseNumber={startingVerseNumber} verses={verses} />
+        )}
+      </Flex>
     </Flex>
   );
 };
